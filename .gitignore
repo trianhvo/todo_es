@@ -1,0 +1,29 @@
+# Node.js
+node_modules/
+package-lock.json
+yarn.lock
+
+# Environment
+.env
+.env.local
+
+# Editor/IDE
+.vscode/
+.idea/
+.editorconfig
+
+# Build/Compile output
+dist/
+coverage/
+
+# Logs and output
+*.log
+logs/
+
+# Dependencies
+.npmrc
+yarn-error.log
+
+# User-specific
+.DS_Store
+Thumbs.db

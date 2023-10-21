@@ -1,16 +1,32 @@
-const taskSchema = {
-    type: "object",
-    properties: {
-      id:{type: "string"},
-      title: { type: "string" },
-      status: { type: "string", enum: ["not started", "in progress", "completed"] },
-      description: { type: "string" },
-    },
-    required: ["title", "status"],
+// create schema
+const createTaskSchema = {
+  type: "object",
+  properties: {
+  category: { type: "string" },
+  id: { type: "number" },
+  title: { type: "string", minLength: 3, maxLength: 100 },
+  description: { type: "string", maxLength: 500 },
+  },
+  required: ["title", "id"],
   };
   
-  module.exports = taskSchema;
   
-
-
+  // update schema
+  const updateTaskSchema = {
+  type: "object",
+  properties: {
+  category: { type: "string" },
+  id: { type: "string" },
+  title: { type: "string", minLength: 3, maxLength: 100 },
+  description: { type: "string", maxLength: 500 },
+  status: { type: "string", enum: ["open", "in progress", "completed"] },
+  },
+  required: [],
+  };
+  
+  
+  module.exports = {
+  createTaskSchema,
+  updateTaskSchema
+  };
   

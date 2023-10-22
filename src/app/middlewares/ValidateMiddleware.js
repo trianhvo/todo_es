@@ -1,6 +1,6 @@
 const Ajv = require("ajv");
-const createTaskSchema = require("../validation/taskSchema").createTaskSchema;
-const updateTaskSchema = require("../validation/taskSchema").updateTaskSchema;
+const createTaskSchema = require("../../validation/taskSchema").createTaskSchema;
+const updateTaskSchema = require("../../validation/taskSchema").updateTaskSchema;
 
 
 const ajv = new Ajv();

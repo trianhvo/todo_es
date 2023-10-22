@@ -8,6 +8,7 @@ const createTaskSchema = {
   description: { type: "string", maxLength: 500 },
   },
   required: ["title", "id"],
+  //issue: must not include status
   };
   
   

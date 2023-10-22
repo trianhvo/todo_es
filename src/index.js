@@ -2,13 +2,16 @@ const express = require('express');
 const app = express();
 const bodyParser = require("body-parser");
 const route = require('./routes/index')
-
+const swaggerJsdoc = require("swagger-jsdoc"),
+  swaggerUi = require("swagger-ui-express");
 
 app.use(express.json());
 app.use(bodyParser.json());
 
 
 route(app)
+
+
 
 
 

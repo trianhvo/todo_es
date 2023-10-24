@@ -37,7 +37,7 @@ class TaskController {
             status,
         };
         try {
-            console.log("tao den truoc")
+            
             const result = await client.index({
                 index: 'todos',
                 type: category,

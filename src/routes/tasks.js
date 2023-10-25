@@ -9,7 +9,7 @@ const taskController = require('../app/controllers/TaskController')
 
 
 
-router.get('/test', taskController.searchTest)
+router.get('/test', taskController.taskTest)
 router.post('/', validateCreateTask, taskController.createTask)
 router.get('/', taskController.searchTask)
 

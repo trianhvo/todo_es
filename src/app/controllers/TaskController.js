@@ -1,5 +1,8 @@
 const { Client } = require('@elastic/elasticsearch');
 const client = new Client({ node: 'http://localhost:9200' });
+require('dotenv').config()
+const config = require('../../config/test-config')
+const configuredIndex = config.elasticsearch.index
 
 
 
@@ -8,24 +11,21 @@ class TaskController {
 
 
     //Create task
-
     async createTask(req, res) {
-        
-        const { category, id, title, description, status } = req.body;
-
-
+        const { category, id, title, description } = req.body;
+        //index with config for main/test
+        const index = configuredIndex;
         const existedTask = await client.exists({
-            index: 'todos',
+            index: index,
             type: category,
             id: id
         })
-
-       
-
         if (existedTask.statusCode == 200) {
-            return res.status(400).send("Task existed")
-            
+            return res.status(400).send("Task existed!")
         }
+
+
+
 
 
 
@@ -34,26 +34,25 @@ class TaskController {
             id,
             title,
             description,
-            status,
+            status: "not started",
         };
         try {
-            
             const result = await client.index({
-                index: 'todos',
+                index: index,
                 type: category,
                 id: id,
                 body: task,
             });
             const createdTask = {
-                _id: result._id,
+                id: result.body._id,
                 title,
                 description,
                 status: "not started",
             };
-            res.status(201).json({ message: 'Task created', task: createdTask }); //simplify
+            res.status(201).json({ message: 'Task created.', task: createdTask });
         } catch (error) {
             console.error(error);
-            res.status(500).send('Task creation failed.');
+            res.status(500).json({ message: "Failed to create task.", error });
         }
     };
 
@@ -68,7 +67,7 @@ class TaskController {
 
         try {
             const response = await client.get({ //https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/5.x/_get.html
-                index: 'todos',
+                index: configuredIndex,
                 type,
                 id,
             });
@@ -79,8 +78,13 @@ class TaskController {
 
             res.json({ task });
         } catch (error) {
-            console.error(error);
-            res.status(500).send('Task not found.');
+
+
+            if (error.statusCode == 404) {
+                return res.status(404).json({ message: "Task not existed!" })
+            } else {
+                return res.status(500).json({ message: "Failed to get task.", error });
+            }
         }
     };
 
@@ -88,6 +92,8 @@ class TaskController {
 
 
     // Update task field
+
+
     async updateTask(req, res) {
         const { type, id } = req.params;
         const { title, description, status } = req.body;
@@ -96,7 +102,7 @@ class TaskController {
         try {
             // Get the task need to update
             const existingTask = await client.get({
-                index: 'todos',
+                index: configuredIndex,
                 type,
                 id,
             });
@@ -121,20 +127,26 @@ class TaskController {
 
 
             // Update the task in db
-            await client.update({ //https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/5.x/_update.html
-                index: 'todos',
+            const updatedResult = await client.update({ //https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/5.x/_update.html
+                index: configuredIndex,
                 type,
                 id,
                 body: {
-                    doc: updatedTask, //this ?
+                    doc: updatedTask,
                 },
             });
-
-
-            res.json({ task: updatedTask });
+            res.json({
+                task: updatedTask,
+                version: updatedResult.body._version
+            });
         } catch (error) {
-            console.error(error);
-            res.status(500).send('Failed to update task.');
+
+
+            if (error.statusCode == 404) {
+                return res.status(404).json({ message: "Task not found!" })
+            } else {
+                return res.status(500).json({ message: "Failed to update task.", error });
+            }
         }
     };
 
@@ -144,20 +156,20 @@ class TaskController {
     // Delete a specific task document by type and ID
     async deleteTask(req, res) {
         const { type, id } = req.params;
-
-
         try {
-            await client.delete({ //https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/5.x/_delete.html
-                index: 'todos',
+            const taskDeleted = await client.delete({ //https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/5.x/_delete.html
+                index: configuredIndex,
                 type,
                 id,
             });
-
-
-            res.status(201).send('Task deleted');
+            res.status(200).json({ message: 'Task deleted!' });
         } catch (error) {
-            console.error(error);
-            res.status(500).send('Failed to delete the task.');
+            console.log(error)
+            if (error.statusCode == 404) {
+                return res.status(404).json({ message: "Task not found" })
+            } else {
+                return res.status(500).json({ message: "Failed to delete task.", error });
+            }
         }
     };
 
@@ -165,6 +177,7 @@ class TaskController {
 
 
     // Search task w/ query params
+    //issue: add sort
     async searchTask(req, res) {
         const { title, description, status } = req.query;
         try {
@@ -186,7 +199,7 @@ class TaskController {
                 query = { match_all: {} };
             }
             const searchQuery = {
-                index: 'todos',
+                index: configuredIndex,
                 body: {
                     query,
                     size: 1000
@@ -210,21 +223,21 @@ class TaskController {
     };
 
 
-    async searchTest(req, res) {
+    async taskTest(req, res) {
+
+
         const { body } = await client.search({
-            index: 'todos',
+            index: configuredIndex,
             body: {
                 query: {
                     term: {
-                        status: "completed"
+                        status: "in progress"
                     }
                 }
             }
         })
-
-
         console.log(body.hits.hits)
-        res.send("ok")
+        res.send(body.hits.hits)
     }
 
 

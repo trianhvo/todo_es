@@ -6,28 +6,15 @@ const validateUpdateTask = require('../app/middlewares/ValidateMiddleware').vali
 
 const taskController = require('../app/controllers/TaskController')
 
+// router.get('/test', taskController.taskTest)
 
-
-
-router.get('/test', taskController.searchTest)
 router.post('/', validateCreateTask, taskController.createTask)
 router.get('/', taskController.searchTask)
 
 
-
-
-
-
-
-
-router.get('/:type/:id', taskController.getTask)
-router.patch('/:type/:id', validateUpdateTask, taskController.updateTask)
-router.delete('/:type/:id', taskController.deleteTask)
-
-
-
-
-
+router.get('/:id', taskController.getTask)
+router.patch('/:id', validateUpdateTask, taskController.updateTask)
+router.delete('/:id', taskController.deleteTask)
 
 
 

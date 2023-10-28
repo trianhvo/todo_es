@@ -1,231 +1,321 @@
+//require elasticsearch
 const { Client } = require('@elastic/elasticsearch');
 const client = new Client({ node: 'http://localhost:9200' });
-
-
+//config env
+require('dotenv').config()
+//import index by env
+const config = require('../../config/test-config')
+const configuredIndex = config.elasticsearch.index
+console.log('........index used in Task Controller......', config)
 
 
 class TaskController {
 
 
-    //Create task
-
-    async createTask(req, res) {
-        
-        const { category, id, title, description, status } = req.body;
-
-
-        const existedTask = await client.exists({
-            index: 'todos',
-            type: category,
-            id: id
-        })
-
-       
-
-        if (existedTask.statusCode == 200) {
-            return res.status(400).send("Task existed")
-            
-        }
-
-
-
-        // Create a new document
-        const task = {
-            id,
-            title,
-            description,
-            status,
-        };
-        try {
-            console.log("tao den truoc")
-            const result = await client.index({
-                index: 'todos',
-                type: category,
-                id: id,
-                body: task,
-            });
-            const createdTask = {
-                _id: result._id,
-                title,
-                description,
-                status: "not started",
-            };
-            res.status(201).json({ message: 'Task created', task: createdTask }); //simplify
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Task creation failed.');
-        }
-    };
+// Func: Create task
+async createTask(req, res) {
+const { id, title, description, category, authorizedBy, dueDate } = req.body;
+const index = configuredIndex;
 
 
 
 
-    //Get task created
-    async getTask(req, res) {
-        // console.log(req.params)
-        const { type, id } = req.params;
-
-
-        try {
-            const response = await client.get({ //https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/5.x/_get.html
-                index: 'todos',
-                type,
-                id,
-            });
-
-
-            const task = response.body;
-
-
-            res.json({ task });
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Task not found.');
-        }
-    };
+// Check if the task (document) already exists
+const existedTask = await client.exists({
+index: index,
+type: 'tasks',
+id: id,
+});
 
 
 
 
-    // Update task field
-    async updateTask(req, res) {
-        const { type, id } = req.params;
-        const { title, description, status } = req.body;
-
-
-        try {
-            // Get the task need to update
-            const existingTask = await client.get({
-                index: 'todos',
-                type,
-                id,
-            });
-
-
-            // console.log(existingTask);
-
-
-            //Update field in _source
-            const updatedTask = existingTask.body._source;
-
-
-            if (title) {
-                updatedTask.title = title;
-            }
-            if (description) {
-                updatedTask.description = description;
-            }
-            if (status) {
-                updatedTask.status = status;
-            }
-
-
-            // Update the task in db
-            await client.update({ //https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/5.x/_update.html
-                index: 'todos',
-                type,
-                id,
-                body: {
-                    doc: updatedTask, //this ?
-                },
-            });
-
-
-            res.json({ task: updatedTask });
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Failed to update task.');
-        }
-    };
+if (existedTask.statusCode == 200) {
+return res.status(400).send("Task already exists!");
+}
 
 
 
 
-    // Delete a specific task document by type and ID
-    async deleteTask(req, res) {
-        const { type, id } = req.params;
-
-
-        try {
-            await client.delete({ //https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/5.x/_delete.html
-                index: 'todos',
-                type,
-                id,
-            });
-
-
-            res.status(201).send('Task deleted');
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Failed to delete the task.');
-        }
-    };
+// Create a new task document with the provided fields
+const task = {
+id,
+title,
+description,
+category,
+authorizedBy,
+dueDate,
+status: "not started",
+createAt: new Date(),
+};
 
 
 
 
-    // Search task w/ query params
-    async searchTask(req, res) {
-        const { title, description, status } = req.query;
-        try {
-            let query = {
-                bool: {
-                    must: [],
-                },
-            };
-            if (title) {
-                query.bool.must.push({ match: { title } });
-            }
-            if (description) {
-                query.bool.must.push({ match: { description } });
-            }
-            if (status) {
-                query.bool.must.push({ term: { status } });
-            }
-            if (query.bool.must.length === 0) {
-                query = { match_all: {} };
-            }
-            const searchQuery = {
-                index: 'todos',
-                body: {
-                    query,
-                    size: 1000
-                },
-            };
-            const response = await client.search(searchQuery);
-            const tasks = response.body.hits.hits.map((hit) => {
-                const task = hit._source;
-                task.category = hit._type;
-                return task;
-            });
-            if (tasks.length === 0) {
-                res.status(404).send('Task not found');
-            } else {
-                res.json({ tasks });
-            }
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Failed to search for tasks.');
-        }
-    };
+try {
+const result = await client.index({
+index: index,
+type: 'tasks',
+id: id,
+body: task,
+});
 
 
-    async searchTest(req, res) {
-        const { body } = await client.search({
-            index: 'todos',
-            body: {
-                query: {
-                    term: {
-                        status: "completed"
-                    }
-                }
-            }
-        })
 
 
-        console.log(body.hits.hits)
-        res.send("ok")
-    }
+console.log('.........result......', result.body);
+res.status(201).json({ message: 'Task created.', task: result.body });
+} catch (error) {
+console.error(error);
+res.status(500).json({ message: "Failed to create task.", error });
+}
+}
+
+
+//Func: Get task created
+async getTask(req, res) {
+// console.log(req.params)
+const { id } = req.params;
+
+
+try {
+const response = await client.get({ //https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/5.x/_get.html
+index: configuredIndex,
+type: 'tasks',
+id,
+});
+
+
+const task = response.body;
+
+
+res.json({ task });
+} catch (error) {
+
+
+if (error.statusCode == 404) {
+return res.status(404).json({ message: "Task not found!" })
+} else {
+return res.status(500).json({ message: "Failed to get task.", error });
+}
+
+
+}
+};
+
+
+
+
+// Func: Update task
+async updateTask(req, res) {
+const { id } = req.params;
+// const { category, title, description, status, authorizedBy, dueDate } = req.body;
+
+
+
+
+try {
+// Get the task that needs to be updated
+const existingTask = await client.get({
+index: configuredIndex,
+type: 'tasks',
+id,
+});
+
+
+
+
+const updatedTask = existingTask.body._source;
+console.log('..........updatedTask.......', updatedTask)
+
+
+// Iterate over the fields provided in the request body and update the task document
+for (const field in req.body) {
+if (field in updatedTask) {
+if (field !== 'authorizedBy') {
+updatedTask[field] = req.body[field];
+}
+else {
+// Merge exited authorizedBy with new one: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax#spread_in_object_literals
+updatedTask.authorizedBy = {
+...updatedTask.authorizedBy,
+...req.body.authorizedBy,
+};
+}
+}
+}
+
+
+// add updateAt
+updatedTask.updateAt = new Date();
+//update to db
+const updatedResult = await client.update({
+index: configuredIndex,
+type: 'tasks',
+id,
+body: {
+doc: updatedTask,
+},
+});
+
+
+res.json({
+task: updatedTask,
+version: updatedResult.body._version,
+});
+} catch (error) {
+if (error.statusCode == 404) {
+return res.status(404).json({ message: "Task not found!" });
+} else {
+return res.status(500).json({ message: "Failed to update task.", error });
+}
+}
+}
+
+
+
+
+
+
+// Func: Delete task by id
+async deleteTask(req, res) {
+const { id } = req.params;
+try {
+await client.delete({ //https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/5.x/_delete.html
+index: configuredIndex,
+type: 'tasks',
+id,
+});
+
+
+res.status(200).json({ message: 'Task deleted!' });
+} catch (error) {
+console.log(error)
+if (error.statusCode == 404) {
+return res.status(404).json({ message: "Task not found" })
+} else {
+return res.status(500).json({ message: "Failed to delete task.", error });
+}
+
+
+}
+};
+
+
+//Func: Search task
+// issue: search last/first Name
+async searchTask(req, res) {
+const { sort, ...filters } = req.query; //sort go sort, others go filters
+
+
+try {
+// Initialize the query
+let query = {
+bool: {
+must: [],
+},
+};
+
+
+
+
+for (const field in filters) { //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...in
+if (filters[field]) {
+const queryType = field === 'status' ? 'term' : 'match'; //booom
+
+
+const pushMe = { [queryType]: { [field]: filters[field] } }
+// console.log('..... [queryType]: { [field]: filters[field] .....', pushMe)//double check
+query.bool.must.push(pushMe);
+}
+}
+
+
+
+
+if (query.bool.must.length === 0) {
+query = { match_all: {} };
+}
+
+
+// Sorting
+let sortOptions = [];
+console.log('.....sort......', typeof (sort))//string: 'id:type'
+if (sort) {
+const sortingFields = sort.split(' '); //must not include in sort string above
+console.log('......sortingFields.......', sortingFields) //convert to arr: [ 'id:desc' ]
+sortingFields.forEach((field) => {
+const [fieldName, order] = field.split(':'); //Split by ':' -> [ 'id', 'desc' ]
+
+
+const pushMeAgain = { [fieldName]: { order } }
+console.log('.....pushMeAgain....', pushMeAgain) //Dynamic key js -> { id: { order: 'desc' } }
+sortOptions.push(pushMeAgain);
+});
+}
+
+
+/*
+[fieldName, order] ------------------[ 'id', 'desc' ]
+{ [fieldName]: { order } } ----------{ id: { order: 'desc' } }
+*/
+
+
+
+
+// Create the search query
+const searchQuery = {
+index: configuredIndex,
+body: {
+query,
+size: 1000,
+sort: sortOptions,
+},
+};
+
+
+const response = await client.search(searchQuery);
+
+
+const tasks = response.body.hits.hits.map((hit) => {
+const task = hit._source;
+return task;
+});
+
+
+if (tasks.length === 0) {
+res.status(404).send('Task not found');
+} else {
+res.json({ tasks });
+}
+} catch (error) {
+console.error(error);
+res.status(500).send('Failed to search for tasks.');
+}
+}
+
+
+
+
+
+
+//Temp test
+async taskTest(req, res) {
+
+
+const { body } = await client.search({
+index: configuredIndex,
+body: {
+query: {
+term: {
+status: "in progress"
+}
+}
+}
+})
+console.log(body.hits.hits)
+res.send(body.hits.hits)
+}
 
 
 

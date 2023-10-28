@@ -1,32 +1,10 @@
-// create schema
-const createTaskSchema = {
-  type: "object",
-  properties: {
-  category: { type: "string" },
-  id: { type: "number" },
-  title: { type: "string", minLength: 3, maxLength: 100 },
-  description: { type: "string", maxLength: 500 },
-  },
-  required: ["title", "id"],
-  };
-  
-  
-  // update schema
-  const updateTaskSchema = {
-  type: "object",
-  properties: {
-  category: { type: "string" },
-  id: { type: "string" },
-  title: { type: "string", minLength: 3, maxLength: 100 },
-  description: { type: "string", maxLength: 500 },
-  status: { type: "string", enum: ["open", "in progress", "completed"] },
-  },
-  required: [],
-  };
-  
-  
-  module.exports = {
+const fs = require('fs');
+
+// Import JSON schemas
+const createTaskSchema = JSON.parse(fs.readFileSync('createTaskSchema.json', 'utf8'));
+const updateTaskSchema = JSON.parse(fs.readFileSync('updateTaskSchema.json', 'utf8'));
+
+module.exports = {
   createTaskSchema,
   updateTaskSchema
-  };
-  
+};

@@ -1,12 +1,13 @@
 const { Given, When, Then } = require('@cucumber/cucumber');
 const axios = require('axios');
 const Ajv = require('ajv');
-const createTaskSchema = require('../../../src/validation/taskSchema').createTaskSchema;
+const createTaskSchema = require('../../../src/app/validation/taskSchema').createTaskSchema;
 const { expect } = require('chai');
-const testConfig = require('../../../src/config/test-config');
 require('dotenv').config()
+const testConfig = require('../../../src/config/test-config');
 
 
+console.log('.......test_env.......', process.env.NODE_ENV)
 const ajv = new Ajv();
 const testIndex = testConfig.elasticsearch.index;
 
@@ -112,8 +113,10 @@ throw new Error(`Output does not match the created task: ${error.message}`);
 
 Then('I delete the task and confirm it\'s deleted', async function () {
 // Delete the task with the stored category and id
-console.log('.......this.taskData.category.......', this.taskData.category)
-console.log('.......this.taskData.id.....', this.taskData.id)
+
+
+
+
 const url = `http://localhost:3000/tasks/${this.taskData.category}/${this.taskData.id}`;
 try {
 const response = await axios.delete(url);

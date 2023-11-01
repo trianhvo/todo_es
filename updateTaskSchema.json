@@ -15,5 +15,6 @@
     },
     "dueDate": { "type": "string", "format": "date" }
   },
-  "required": []
+  "required": [],
+  "additionalProperties": false
 }

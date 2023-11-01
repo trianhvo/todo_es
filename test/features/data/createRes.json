@@ -1,0 +1,83 @@
+[
+    {
+      "message": "Task created.",
+      "task": {
+        "_index": "todos",
+        "_type": "tasks",
+        "_id": "1",
+        "_version": 1,
+        "result": "created",
+        "_shards": {
+          "total": 2,
+          "successful": 1,
+          "failed": 0
+        },
+        "created": true
+      }
+    },
+    {
+      "message": "Task created.",
+      "task": {
+        "_index": "todos",
+        "_type": "tasks",
+        "_id": "2",
+        "_version": 1,
+        "result": "created",
+        "_shards": {
+          "total": 2,
+          "successful": 1,
+          "failed": 0
+        },
+        "created": true
+      }
+    },
+    {
+      "message": "Task created.",
+      "task": {
+        "_index": "todos",
+        "_type": "tasks",
+        "_id": "3",
+        "_version": 1,
+        "result": "created",
+        "_shards": {
+          "total": 2,
+          "successful": 1,
+          "failed": 0
+        },
+        "created": true
+      }
+    },
+    {
+      "message": "Task created.",
+      "task": {
+        "_index": "todos",
+        "_type": "tasks",
+        "_id": "4",
+        "_version": 1,
+        "result": "created",
+        "_shards": {
+          "total": 2,
+          "successful": 1,
+          "failed": 0
+        },
+        "created": true
+      }
+    },
+    {
+      "message": "Task created.",
+      "task": {
+        "_index": "todos",
+        "_type": "tasks",
+        "_id": "5",
+        "_version": 1,
+        "result": "created",
+        "_shards": {
+          "total": 2,
+          "successful": 1,
+          "failed": 0
+        },
+        "created": true
+      }
+    }
+  ]
+  

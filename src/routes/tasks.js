@@ -1,8 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const validateCreateTask = require('../app/middlewares/ValidateMiddleware').validateCreateTask
-const validateUpdateTask = require('../app/middlewares/ValidateMiddleware').validateUpdateTask
-
+const {validateCreateTask, validateUpdateTask} = require('../app/middlewares/ValidateMiddleware')
 
 const taskController = require('../app/controllers/TaskController')
 
@@ -13,7 +11,7 @@ router.get('/', taskController.searchTask)
 
 
 router.get('/:id', taskController.getTask)
-router.patch('/:id', validateUpdateTask, taskController.updateTask)
+router.put('/:id', validateUpdateTask, taskController.updateTask)
 router.delete('/:id', taskController.deleteTask)
 
 

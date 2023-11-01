@@ -1,0 +1,58 @@
+[
+    {
+      "category": "project",
+      "id": 1,
+      "title": "Project 1",
+      "description": "Description 1",
+      "authorizedBy": {
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "dueDate": "2023-11-30"
+    },
+    {
+      "category": "task",
+      "id": 2,
+      "title": "Task 2",
+      "description": "Description 2",
+      "authorizedBy": {
+        "firstName": "Alice",
+        "lastName": "Smith"
+      },
+      "dueDate": "2023-12-15"
+    },
+    {
+      "category": "work",
+      "id": 3,
+      "title": "Work Task",
+      "description": "Work Description",
+      "authorizedBy": {
+        "firstName": "Robert",
+        "lastName": "Johnson"
+      },
+      "dueDate": "2023-12-01"
+    },
+    {
+      "category": "meeting",
+      "id": 4,
+      "title": "Meeting Notes",
+      "description": "Meeting Description",
+      "authorizedBy": {
+        "firstName": "Emily",
+        "lastName": "Wilson"
+      },
+      "dueDate": "2023-11-25"
+    },
+    {
+      "category": "personal",
+      "id": 5,
+      "title": "Personal Task",
+      "description": "Personal Description",
+      "authorizedBy": {
+        "firstName": "David",
+        "lastName": "Brown"
+      },
+      "dueDate": "2023-12-10"
+    }
+  ]
+  

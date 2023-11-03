@@ -6,14 +6,15 @@ require('dotenv').config()
 //import index by env
 const config = require('../../config/test-config')
 const index = config.elasticsearch.index
-console.log('........index used in Task Controller......', config)
-
+console.log('........index used in Task Controller......', index)
+const fs = require('fs');
+const path = require('path');
 
 class TaskController {
     // Func: Create task
     async createTask(req, res) {
         const { id, title, description, category, authorizedBy, dueDate } = req.body;
-        
+
 
         // Check if the task (document) already exists
         const existedTask = await client.exists({
@@ -22,6 +23,7 @@ class TaskController {
             id,
         });
 
+        //issue: bug, if test use existed id, instead of returns this message, it just returns AxiosError 400
         if (existedTask.statusCode == 200) {
             return res.status(400).send("Task already exists!");
         }
@@ -49,10 +51,10 @@ class TaskController {
 
 
             console.log('.........result......', result.body);
-            res.status(201).json({ message: 'Task created.', task: result.body });
+            return res.status(201).json({ message: 'Task created.', task: result.body });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Failed to create task.", error });
+            return res.status(500).json({ message: "Failed to create task.", error });
         }
     }
 
@@ -77,7 +79,7 @@ class TaskController {
             const task = response.body;
 
 
-            res.json({ task });
+            return res.json({ task });
         } catch (error) {
 
 
@@ -91,15 +93,6 @@ class TaskController {
         }
     };
 
-
-
-
-
-
-
-
-
-
     // Func: Update task
     async updateTask(req, res) {
         const { id } = req.params;
@@ -111,22 +104,7 @@ class TaskController {
                 type: 'tasks',
                 id,
             });
-            // console.log('..........updatedTask.......', updatedTask)
-            // // Iterate over the fields provided in the request body and update the task document
-            // for (const field in req.body) {
-            //     if (field in updatedTask) {
-            //         if (field !== 'authorizedBy') {
-            //             updatedTask[field] = req.body[field];
-            //         }
-            //         else {
-            //             // Merge exited authorizedBy with new one: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax#spread_in_object_literals
-            //             updatedTask.authorizedBy = {
-            //                 ...updatedTask.authorizedBy,
-            //                 ...req.body.authorizedBy,
-            //             };
-            //         }
-            //     }
-            // }
+  
             const updatedTask = req.body
             // add updateAt
             updatedTask.updateAt = new Date();
@@ -148,7 +126,7 @@ class TaskController {
             });
         } catch (error) {
             if (error.statusCode == 404) {
-                return res.status(404).json({ message: "Task not found!" });
+                return res.status(400).json({ message: "Task not found!" });
             } else {
                 return res.status(500).json({ message: "Failed to update task.", error });
             }
@@ -157,14 +135,11 @@ class TaskController {
 
 
 
-
-
-
-    // Func: Delete task by id
+    // Func: Delete task by id on url, example: localhost:3000/users/1
     async deleteTask(req, res) {
         const { id } = req.params;
         try {
-            await client.delete({ //https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/5.x/_delete.html
+            await client.delete({
                 index,
                 type: 'tasks',
                 id,
@@ -186,10 +161,10 @@ class TaskController {
 
 
     //Func: Search task
-    // issue: search last/first Name
+    // issue: search last/first Name (authorizedBy= 1 in 2)
     async searchTask(req, res) {
         const { sortBy = "id", sortOrder = "asc", ...filters } = req.query; //sort go sort, others go filters
-console.log('....',sortBy,sortOrder )
+
 
         try {
             // Initialize the query
@@ -215,32 +190,6 @@ console.log('....',sortBy,sortOrder )
                 query = { match_all: {} };
             }
 
-
-            // // Sorting
-            // let sortOptions = [];
-            // console.log('.....sort......', typeof (sort))//string: 'id:type'
-            // if (sort) {
-            //     const sortingFields = sort.split(' '); //must not include in sort string above
-            //     console.log('......sortingFields.......', sortingFields) //convert to arr: [ 'id:desc' ]
-            //     sortingFields.forEach((field) => {
-            //         const [fieldName, order] = field.split(':'); //Split by ':' -> [ 'id', 'desc' ]
-
-
-            //         const pushMeAgain = { [fieldName]: { order } }
-            //         console.log('.....pushMeAgain....', pushMeAgain) //Dynamic key js -> { id: { order: 'desc' } }
-            //         sortOptions.push(pushMeAgain);
-            //     });
-            // }
-
-
-            /*
-            [fieldName, order] ------------------[ 'id', 'desc' ]
-            { [fieldName]: { order } } ----------{ id: { order: 'desc' } }
-            */
-
-
-
-
             // Create the search query
             const searchQuery = {
                 index,
@@ -256,7 +205,6 @@ console.log('....',sortBy,sortOrder )
                 },
             };
 
-
             const response = await client.search(searchQuery);
 
 
@@ -267,7 +215,7 @@ console.log('....',sortBy,sortOrder )
 
 
             if (tasks.length === 0) {
-                res.status(404).send('Task not found');
+                res.status(404).send('Task not found!');
             } else {
                 res.json({ tasks });
             }
@@ -282,45 +230,25 @@ console.log('....',sortBy,sortOrder )
 
 
 
-    //Temp test
-    async taskTest(req, res) {
+    //Bulk
 
+    async bulkDataset(req, res) {
+        const datasetPath = path.resolve(__dirname, '../../../test/dataset/dataset.json');
+        const dataset = JSON.parse(fs.readFileSync(datasetPath, 'utf8'));
+      
+        const bulkData = [];
+        
+        for (const object of dataset) {
+          bulkData.push({ index: { _index: 'todos_test', _type: 'tasks', _id: object.id } });
+          bulkData.push(object);
+        }
+        await client.bulk({ 
+            refresh: true, 
+            body: bulkData });
 
-        const { body } = await client.search({
-            index,
-            body: {
-                query: {
-                    term: {
-                        status: "in progress"
-                    }
-                }
-            }
-        })
-        console.log(body.hits.hits)
-        res.send(body.hits.hits)
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        res.send(bulkData)
+      }
+      
 
 
 }

@@ -2,15 +2,14 @@
 ```
 todo_es
 ├─ .env
-├─ README.md
-├─ createTaskSchema.json
 ├─ package.json
+├─ README.md
 ├─ src
 │  ├─ app
 │  │  ├─ controllers
-│  │  │  ├─ DevController.js
 │  │  │  ├─ MappingController.js
-│  │  │  └─ TaskController.js
+│  │  │  ├─ TaskController.js
+│  │  │  └─ UserController.js
 │  │  └─ middlewares
 │  │     └─ ValidateMiddleware.js
 │  ├─ config
@@ -19,23 +18,26 @@ todo_es
 │  │  └─ test-config.js
 │  ├─ index.js
 │  ├─ routes
-│  │  ├─ dev.js
 │  │  ├─ index.js
-│  │  ├─ mapping.js
-│  │  └─ tasks.js
+│  │  ├─ mappings.js
+│  │  ├─ tasks.js
+│  │  └─ users.js
 │  └─ validation
+│     ├─ schema
+│     │  ├─ createTaskSchema.json
+│     │  └─ updateTaskSchema.json
 │     └─ taskSchema.js
-├─ test
-│  └─ features
-│     ├─ data
-│     │  ├─ createReq.json
-│     │  └─ createRes.json
-│     ├─ report
-│     │  ├─ cucumber_report.html
-│     │  └─ cucumber_report.json
-│     ├─ step_definitions
-│     │  └─ taskStepDefs.js
-│     └─ task-servive.feature
-└─ updateTaskSchema.json
+└─ test
+   ├─ features
+   │  ├─ dataset
+   │  │  └─ dataset.json
+   │  ├─ data_test
+   │  ├─ report
+   │  │  ├─ cucumber_report.html
+   │  │  └─ cucumber_report.json
+   │  ├─ step_definitions
+   │  │  └─ stepdefs.js
+   │  └─ tasks.feature
+   └─ unit_test
 
 ```

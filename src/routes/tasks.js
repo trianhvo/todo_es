@@ -1,13 +1,18 @@
 const express = require('express')
 const router = express.Router()
-const {validateCreateTask, validateUpdateTask} = require('../app/middlewares/ValidateMiddleware')
+const validateCreateTask = require('../app/middlewares/ValidateMiddleware').validateCreateTask
+const validateUpdateTask = require('../app/middlewares/ValidateMiddleware').validateUpdateTask
 
 const taskController = require('../app/controllers/TaskController')
 
-// router.get('/test', taskController.taskTest)
+
+router.post('/bulk', taskController.bulkDataset)
+
 
 router.post('/', validateCreateTask, taskController.createTask)
 router.get('/', taskController.searchTask)
+
+
 
 
 router.get('/:id', taskController.getTask)

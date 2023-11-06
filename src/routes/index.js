@@ -4,7 +4,7 @@
 
 const taskRouter = require('./tasks')
 const mappingRouter = require('./mappings')
-// const devRouter = require('./dev')
+const userRouter = require('./users')
 
 
 
@@ -14,7 +14,7 @@ app.use('/mappings', mappingRouter)
 
 app.use('/tasks', taskRouter)
 
-// app.use('/dev', devRouter)
+app.use('/users', userRouter)
 
 app.use('/', function(req, res){
     console.log("Welcome") 

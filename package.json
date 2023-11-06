@@ -14,11 +14,13 @@
     "@shelf/jest-elasticsearch": "^5.2.0",
     "ajv": "^6.12.6",
     "axios": "^1.5.1",
+    "bcrypt": "^5.1.1",
     "chai": "^4.3.10",
     "cucumber-html-reporter": "^7.1.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jest": "^29.7.0",
+    "jsonwebtoken": "^9.0.2",
     "mocha": "^10.2.0",
     "nodemon": "^3.0.1"
   },

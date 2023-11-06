@@ -4,19 +4,12 @@ const bodyParser = require("body-parser");
 const route = require('./routes/index')
 require('dotenv').config()
 
-
 console.log('......env.........', process.env.NODE_ENV)
 app.use(express.json());
 app.use(bodyParser.json());
 
 
-
-
 route(app)
-
-
-
-
 
 
 

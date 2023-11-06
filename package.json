@@ -4,23 +4,26 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-  "start": "nodemon src/index.js",
-  "test": "cucumber-js test/features"
+    "start": "nodemon src/index.js",
+    "test": "cucumber-js test/features"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-  "@elastic/elasticsearch": "^5.6.22",
-  "ajv": "^6.12.6",
-  "axios": "^1.5.1",
-  "chai": "^4.3.10",
-  "dotenv": "^16.3.1",
-  "express": "^4.18.2",
-  "mocha": "^10.2.0",
-  "nodemon": "^3.0.1"
+    "@elastic/elasticsearch": "^5.6.22",
+    "@shelf/jest-elasticsearch": "^5.2.0",
+    "ajv": "^6.12.6",
+    "axios": "^1.5.1",
+    "chai": "^4.3.10",
+    "cucumber-html-reporter": "^7.1.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jest": "^29.7.0",
+    "mocha": "^10.2.0",
+    "nodemon": "^3.0.1"
   },
   "devDependencies": {
-  "@cucumber/cucumber": "^10.0.0",
-  "cross-env": "^7.0.3"
+    "@cucumber/cucumber": "^10.0.0",
+    "cross-env": "^7.0.3"
   }
-  }
+}

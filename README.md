@@ -2,14 +2,14 @@
 ```
 todo_es
 ├─ .env
-├─ README.md
 ├─ package.json
+├─ README.md
 ├─ src
 │  ├─ app
 │  │  ├─ controllers
-│  │  │  ├─ CategoryController.js
-│  │  │  ├─ DevController.js
-│  │  │  └─ TaskController.js
+│  │  │  ├─ MappingController.js
+│  │  │  ├─ TaskController.js
+│  │  │  └─ UserController.js
 │  │  └─ middlewares
 │  │     └─ ValidateMiddleware.js
 │  ├─ config
@@ -18,16 +18,26 @@ todo_es
 │  │  └─ test-config.js
 │  ├─ index.js
 │  ├─ routes
-│  │  ├─ categories.js
-│  │  ├─ dev.js
 │  │  ├─ index.js
-│  │  └─ tasks.js
+│  │  ├─ mappings.js
+│  │  ├─ tasks.js
+│  │  └─ users.js
 │  └─ validation
+│     ├─ schema
+│     │  ├─ createTaskSchema.json
+│     │  └─ updateTaskSchema.json
 │     └─ taskSchema.js
 └─ test
-   └─ features
-      ├─ step_definitions
-      │  └─ taskStepDefs.js
-      └─ task-servive.feature
+   ├─ features
+   │  ├─ dataset
+   │  │  └─ dataset.json
+   │  ├─ data_test
+   │  ├─ report
+   │  │  ├─ cucumber_report.html
+   │  │  └─ cucumber_report.json
+   │  ├─ step_definitions
+   │  │  └─ stepdefs.js
+   │  └─ tasks.feature
+   └─ unit_test
 
 ```

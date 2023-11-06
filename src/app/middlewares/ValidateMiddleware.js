@@ -1,36 +1,42 @@
 const Ajv = require("ajv");
-const createTaskSchema = require("../../validation/taskSchema").createTaskSchema;
-const updateTaskSchema = require("../../validation/taskSchema").updateTaskSchema;
-
+const {createTaskSchema, updateTaskSchema} = require("../validation/taskSchema");
 
 const ajv = new Ajv();
 
-
 function validateCreateTask(req, res, next) {
-const valid = ajv.validate(createTaskSchema, req.body);
-console.log(valid)
-if (!valid) {
-const validationErrors = ajv.errors;
-return res.status(400).json({ message: "You shall not pass!", errors: validationErrors });
-}
-next();
-}
+  const valid = ajv.validate(createTaskSchema, req.body);
+  const validate = ajv.compile(createTaskSchema);
+  console.log('create validation pass: ', valid)
+  if (!valid) {
+    const validationError = ajv.errorsText(validate.errors, { separator: ' ' });
 
+  
+    const errorMessage = "Your input is invalid";
+    const error = validationError;
+  
+    return res.status(400).json({ message: errorMessage, error });
+  }
+  next();
+}
 
 function validateUpdateTask(req, res, next) {
-const valid = ajv.validate(updateTaskSchema, req.body);
+  const valid = ajv.validate(updateTaskSchema, req.body);
+  const validate = ajv.compile(updateTaskSchema);
+  console.log('update validation pass: ', valid)
 
 
-console.log(valid)
-if (!valid) {
-const validationErrors = ajv.errors;
-return res.status(400).json({ message: "You shall not pass!", errors: validationErrors });
+  if (!valid) {
+    const validationError = ajv.errorsText(validate.errors, { separator: ' ' });
+  
+    const errorMessage = "Your input is invalid";
+    const error = validationError;
+  
+    return res.status(400).json({ message: errorMessage, error });
+  }
+  next();
 }
-next();
-}
-
 
 module.exports = {
-validateCreateTask,
-validateUpdateTask
+  validateCreateTask,
+  validateUpdateTask
 }

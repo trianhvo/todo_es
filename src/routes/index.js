@@ -1,32 +1,26 @@
+// const { Client, errors } = require('@elastic/elasticsearch');
+// const client = new Client({ node: 'http://localhost:9200' });
+
+
 const taskRouter = require('./tasks')
-const mappingRouter = require('./mapping')
-const devRouter = require('./dev')
-
-const swaggerJsdoc = require("swagger-jsdoc"),
-  swaggerUi = require("swagger-ui-express");
-
-const options = require('../config/swagger-ui')
+const mappingRouter = require('./mappings')
+// const devRouter = require('./dev')
 
 
-function route(app) {
 
-  app.use('/mapping', mappingRouter)
+function route(app){
 
-  app.use('/tasks', taskRouter)
+app.use('/mappings', mappingRouter)
 
-  app.use('/dev', devRouter)
+app.use('/tasks', taskRouter)
 
-  const specs = swaggerJsdoc(options);
-  app.use(
-    "/api-docs",
-    swaggerUi.serve,
-    swaggerUi.setup(specs, { explorer: true })
-  );
+// app.use('/dev', devRouter)
+
+app.use('/', function(req, res){
+    console.log("Welcome") 
+})
 
 
-  app.use('/', function (req, res) {
-    res.json("Welcome")
-  })
 
 
 }

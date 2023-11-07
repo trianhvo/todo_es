@@ -5,13 +5,12 @@ var router = express.Router()
 const mappingController = require('../app/controllers/MappingController')
 
 
-// router.get('/:type', mappingController.getTaskInMapping) // remove
 
 
 router.put('/', mappingController.addFieldToMapping)     
-router.get('/', mappingController.getMapping) 
+router.get('/:index', mappingController.getMapping) 
 router.delete('/', mappingController.deleteIndex)
-router.post('/', mappingController.createMapping)
+router.post('/', mappingController.createIndex)
 
 
 

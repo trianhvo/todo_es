@@ -5,14 +5,6 @@
       "title": { "type": "string", "minLength": 3, "maxLength": 100 },
       "description": { "type": "string", "maxLength": 500 },
       "status": { "type": "string", "enum": ["Open", "In progress", "Completed"] },
-      "authorizedBy": {
-        "type": "object",
-        "properties": {
-          "firstName": { "type": "string", "minLength": 2, "maxLength": 50 },
-          "lastName": { "type": "string", "minLength": 2, "maxLength": 50 }
-        },
-        "additionalProperties": false
-      },
       "dueDate": { "type": "string", "format": "date" }
     },
     "required": [],

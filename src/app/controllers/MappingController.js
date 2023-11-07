@@ -5,67 +5,28 @@ const client = new Client({ node: 'http://localhost:9200' });
 require('dotenv').config()
 
 //import index by env
-const config = require('../../config/test-config')
-const configuredIndex = config.elasticsearch.index
-console.log('........index used in Mapping Controller......', config)
+const config = require('../../config/test-config');
+const { response } = require('express');
+const index = config.elasticsearch.todosIndex
+console.log('........index used in Mapping Controller......', index)
+
+
+
+
 
 class MappingController {
 
 
-  // Func: Create a new mapping
-  async createMapping(req, res) {
+  // Func: Create index with template
+  async createIndex(req, res) {
+      const {index} = req.body
     try {
-
-
-      const existedType = await client.indices.existsType({
-        index: configuredIndex,
-        type: 'tasks',
+      const response = await client.indices.create({
+        index,
       })
-      if (existedType.statusCode == 200) {
-        return res.status(400).send("Can not create mapping: type existed!")
-      }
-
-      const manualMapping = req.body;
-      if (manualMapping) {
-
-      }
-
-      // Define the default mapping
-      const defaultMapping = {
-        properties: {
-          category: { type: 'text' },
-          id: { type: 'long' },
-          title: { type: 'text' },
-          description: { type: 'text' },
-          status: { type: 'keyword' },
-          authorizedBy: {
-            properties: {
-              firstName: { type: 'text' },
-              lastName: { type: 'text' },
-            },
-          },
-          dueDate: { type: 'date' },
-          createAt: { type: 'date' },
-          updateAt: { type: 'date' },
-        },
-      };
-
-
-
-      const mapping = Object.keys(manualMapping).length > 0 ? manualMapping : defaultMapping;
-      // console.log('.......mapping.......',manualMapping)
-
-      await client.indices.putMapping({
-        index: configuredIndex,
-        type: 'tasks',
-        body: mapping,
-      });
-
-
-      res.status(201).json('Mapping created');
+      res.status(201).json(`Index ${index} created`);
     } catch (error) {
-      console.error(error);
-      res.status(500).send('Failed to create mapping.');
+      res.status(400).json({error: error.message})
     }
   }
 
@@ -75,11 +36,7 @@ class MappingController {
   // Func: Add fields to a mapping
   async addFieldToMapping(req, res) {
 
-    const { field, datatype } = req.body;
-
-
-    console.log('field: ', field)
-    console.log('datatype', datatype)
+    const { index, type, field, datatype } = req.body;
     try {
       // Temp mapping
       const fieldMapping = {
@@ -89,18 +46,16 @@ class MappingController {
           },
         },
       };
-      console.log('fieldMapping', fieldMapping)
 
       // Update the mapping 
       await client.indices.putMapping({
-        index: configuredIndex,
-        type: 'tasks',
+        index,
+        type,
         body: fieldMapping,
       });
 
       res.send('Mapping updated');
     } catch (error) {
-      console.error(error);
       res.status(500).send('Failed to update mapping.');
     }
   };
@@ -110,39 +65,39 @@ class MappingController {
 
   //Func: get mapping
   async getMapping(req, res) {
-    const fields = req.params
-    console.log(fields)
+    const {index} = req.params
     try {
 
       const mapping = await client.indices.getMapping({
-        index: configuredIndex,
-        type: 'tasks'
-
+        index
       })
-      res.status(200).json(mapping.body.todos.mappings.tasks);
+      res.status(200).json(mapping.body);
 
     } catch (error) {
-      console.error(error);
-      res.status(500).send('Failed to get index mapping.');
+      if(error.statusCode == 404){
+        res.status(404).send('Not found index.')
+      }else{
+        res.status(400).send('Failed to get index mapping.')
+      }
     }
   };
 
   //Func: delete mapping (delete index)
   //issue: add not found mapping
   async deleteIndex(req, res) {
-    const index = configuredIndex
+    const {index} = req.body
     try {
-      await client.indices.delete({
-        index: index
+      const response = await client.indices.delete({
+        index
       });
       
-      const response = await client.indices.create({
-        index: index
+      await client.indices.create({
+        index
       });
 
       res.json({ message: 'Done!' });
     } catch (error) {
-      console.error(error); res.status(500).send('Failed to delete index.');
+      res.status(400).send('Failed to delete index.');
     }
   }
 

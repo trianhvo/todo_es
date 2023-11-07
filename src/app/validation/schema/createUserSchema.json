@@ -1,0 +1,13 @@
+{
+    "type": "object",
+    "properties": {
+      "username": { "type": "string", "minLength": 2, "maxLength": 20 },
+      "password": { "type": "string"},
+      "email": { "type": "string", "format": "email" },
+      "firstName": { "type": "string", "minLength": 3, "maxLength": 100 },
+      "lastName": { "type": "string", "maxLength": 500 },
+      "phone": { "type": "string", "maxLength":20 }
+    },
+    "required": ["username", "password", "email", "firstName", "lastName", "phone"],
+    "additionalProperties": false
+  }

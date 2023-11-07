@@ -1,0 +1,77 @@
+async createMapping(req, res) {
+    try {
+
+
+      const existedType = await client.indices.existsType({
+        index: configuredIndex,
+        type: 'tasks',
+      })
+      if (existedType.statusCode == 200) {
+        return res.status(400).send("Can not create mapping: type existed!")
+      }
+
+      const manualMapping = req.body;
+      if (manualMapping) {
+
+      }
+
+      // Define the default mapping
+      const defaultMapping = {
+        properties: {
+          category: { type: 'text' },
+          id: { type: 'long' },
+          title: { type: 'text' },
+          description: { type: 'text' },
+          status: { type: 'keyword' },
+          authorizedBy: {
+            properties: {
+              firstName: { type: 'text' },
+              lastName: { type: 'text' },
+            },
+          },
+          dueDate: { type: 'date' },
+          createAt: { type: 'date' },
+          updateAt: { type: 'date' },
+        },
+      };
+
+
+
+      const mapping = Object.keys(manualMapping).length > 0 ? manualMapping : defaultMapping;
+      // console.log('.......mapping.......',manualMapping)
+
+      await client.indices.putMapping({
+        index: configuredIndex,
+        type: 'tasks',
+        body: mapping,
+      });
+
+
+      res.status(201).json('Mapping created');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Failed to create mapping.');
+    }
+  }
+
+
+  ===============================================================================
+  const validPrefixes = ["todos", "users"];
+
+function validateIndex(index) {
+  if (!index) {
+    return false;
+  }
+
+  // Check if the index starts with a valid prefix
+  if (!validPrefixes.some((prefix) => index.startsWith(prefix))) {
+    return false;
+  }
+
+  // Check if the index contains only alphanumeric characters and underscores
+  if (!/^[a-zA-Z0-9_]+$/.test(index)) {
+    return false;
+  }
+
+  return true;
+}

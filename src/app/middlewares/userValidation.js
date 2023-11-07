@@ -1,11 +1,11 @@
 const Ajv = require("ajv");
-const {createTaskSchema, updateTaskSchema} = require("../validation/taskSchema");
+const {createUserSchema, updateUserSchema} = require("../validation/schemaReader");
 
 const ajv = new Ajv();
 
-function validateCreateTask(req, res, next) {
-  const valid = ajv.validate(createTaskSchema, req.body);
-  const validate = ajv.compile(createTaskSchema);
+function validateCreateUser(req, res, next) {
+  const valid = ajv.validate(createUserSchema, req.body);
+  const validate = ajv.compile(createUserSchema);
   console.log('create validation pass: ', valid)
   if (!valid) {
     const validationError = ajv.errorsText(validate.errors, { separator: ' ' });
@@ -19,9 +19,9 @@ function validateCreateTask(req, res, next) {
   next();
 }
 
-function validateUpdateTask(req, res, next) {
-  const valid = ajv.validate(updateTaskSchema, req.body);
-  const validate = ajv.compile(updateTaskSchema);
+function validateUpdateUser(req, res, next) {
+  const valid = ajv.validate(updateUserSchema, req.body);
+  const validate = ajv.compile(updateUserSchema);
   console.log('update validation pass: ', valid)
 
 
@@ -37,6 +37,6 @@ function validateUpdateTask(req, res, next) {
 }
 
 module.exports = {
-  validateCreateTask,
-  validateUpdateTask
+    validateCreateUser,
+    validateUpdateUser
 }

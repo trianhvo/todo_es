@@ -1,25 +1,30 @@
 const express = require('express')
 const router = express.Router()
-const validateCreateTask = require('../app/middlewares/ValidateMiddleware').validateCreateTask
-const validateUpdateTask = require('../app/middlewares/ValidateMiddleware').validateUpdateTask
+//validate task
+const {validateCreateTask, validateUpdateTask} = require('../app/middlewares/taskValidation')
 
+//validate auth
+const taskOwnershipValidation = require('../app/middlewares/taskOwnershipValidation')
+const authValidation = require('../app/middlewares/authValidation')
 const taskController = require('../app/controllers/TaskController')
 
 
 router.post('/bulk', taskController.bulkDataset)
 
-
-router.post('/', validateCreateTask, taskController.createTask)
-router.get('/', taskController.searchTask)
+router.get('/search', taskController.searchTask)
 
 
 
 
-router.get('/:id', taskController.getTask)
-router.put('/:id', validateUpdateTask, taskController.updateTask)
-router.delete('/:id', taskController.deleteTask)
+router.get('/:id',authValidation, taskOwnershipValidation, taskController.getTask)
 
 
+router.post('/',authValidation, validateCreateTask, taskController.createTask) 
+router.put('/:id',authValidation, taskOwnershipValidation, validateUpdateTask, taskController.updateTask)
+router.delete('/:id',authValidation, taskOwnershipValidation, taskController.deleteTask)
+
+
+router.get('/',authValidation, taskController.getAllTask)
 
 
 

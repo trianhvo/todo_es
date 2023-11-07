@@ -5,7 +5,7 @@ const client = new Client({ node: 'http://localhost:9200' });
 require('dotenv').config()
 //import index by env
 const config = require('../../config/test-config')
-const index = config.elasticsearch.index
+const index = config.elasticsearch.todosIndex
 console.log('........index used in Task Controller......', index)
 const fs = require('fs');
 const path = require('path');
@@ -13,8 +13,7 @@ const path = require('path');
 class TaskController {
     // Func: Create task
     async createTask(req, res) {
-        const { id, title, description, category, authorizedBy, dueDate } = req.body;
-
+        const { id, title, description, category, dueDate } = req.body;
 
         // Check if the task (document) already exists
         const existedTask = await client.exists({
@@ -23,18 +22,21 @@ class TaskController {
             id,
         });
 
-        //issue: bug, if test use existed id, instead of returns this message, it just returns AxiosError 400
         if (existedTask.statusCode == 200) {
             return res.status(400).send("Task already exists!");
         }
 
         // Create a new task document with the provided fields
         const task = {
+            userId: req.userId,
             id,
             title,
             description,
             category,
-            authorizedBy,
+            authorizedBy:{
+                firstName: req.userData.firstName,
+                lastName: req.userData.lastName
+            },
             dueDate,
             status: "not started",
             createAt: new Date(),
@@ -50,7 +52,7 @@ class TaskController {
 
 
 
-            console.log('.........result......', result.body);
+            // console.log('.........result......', result.body);
             return res.status(201).json({ message: 'Task created.', task: result.body });
         } catch (error) {
             console.error(error);
@@ -96,11 +98,10 @@ class TaskController {
     // Func: Update task
     async updateTask(req, res) {
         const { id } = req.params;
-        // const { category, title, description, status, authorizedBy, dueDate } = req.body;
         try {
             // Get the task that needs to be updated
             const existingTask = await client.get({
-                index: index,
+                index,
                 type: 'tasks',
                 id,
             });
@@ -126,7 +127,7 @@ class TaskController {
             });
         } catch (error) {
             if (error.statusCode == 404) {
-                return res.status(400).json({ message: "Task not found!" });
+                return res.status(404).json({ message: "Task not found!" });
             } else {
                 return res.status(500).json({ message: "Failed to update task.", error });
             }
@@ -159,12 +160,35 @@ class TaskController {
         }
     };
 
+    //Func: Get all tasks of an user
+    async getAllTask(req, res){
+        const userId = req.userId
+        try {
+            const usersTasks = await client.search({
+                index,
+                type: 'tasks',
+                body: {
+                    query: {
+                        term: { userId },
+                    },
+                },
+            });
+            res.status(200).send(usersTasks.body.hits.hits)
+        } catch (error) {
+            throw error
+        }
+
+
+    }
+
+
+
+
 
     //Func: Search task
-    // issue: search last/first Name (authorizedBy= 1 in 2)
     async searchTask(req, res) {
         const { sortBy = "id", sortOrder = "asc", ...filters } = req.query; //sort go sort, others go filters
-
+        const sensitiveFields = ['password']; 
 
         try {
             // Initialize the query
@@ -176,7 +200,7 @@ class TaskController {
 
             for (const field in filters) { //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...in
                 if (filters[field]) {
-                    const queryType = field === 'status' ? 'term' : 'match'; //booom
+                    const queryType = field === 'userId' ? 'term' : 'match'; //booom
 
 
                     const pushMe = { [queryType]: { [field]: filters[field] } }
@@ -207,7 +231,6 @@ class TaskController {
 
             const response = await client.search(searchQuery);
 
-
             const tasks = response.body.hits.hits.map((hit) => {
                 const task = hit._source;
                 return task;
@@ -217,7 +240,7 @@ class TaskController {
             if (tasks.length === 0) {
                 res.status(404).send('Task not found!');
             } else {
-                res.json({ tasks });
+                res.json({ message: `total tasks found: ${response.body.hits.total}`,tasks });
             }
         } catch (error) {
             console.error(error);

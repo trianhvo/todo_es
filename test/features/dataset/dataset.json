@@ -14,8 +14,8 @@
     {"id": 5, "title": "Develop new mobile app", "description": "Design and develop a new mobile app for the company that allows customers to easily browse and purchase products, manage their accounts, and access customer support.", "category": "Software Development", "authorizedBy": {"firstName":"David","lastName":"Brown"}, "dueDate": "2023-11-14", "status": "In progress", "createAt": "2023-10-27", "updatedAt":"2023-10-27"},
     
     
-    {"id": 6, "title": "Research security measures", "description": "Identify and implement new security measures to protect the company's website and systems from cyberattacks.", "category": "IT Security", "authorizedBy": {"firstName":"Mary","lastName":"Jones"}, "dueDate": "2023-11-17", "status": "Not started", "createAt": "2023-10-27", "updatedAt":"2023-10-27"}
-    
-    
+    {"id": 6, "title": "Research security measures", "description": "Identify and implement new security measures to protect the company's website and systems from cyberattacks.", "category": "IT Security", "authorizedBy": {"firstName":"Mary","lastName":"Jones"}, "dueDate": "2023-11-17", "status": "Not started", "createAt": "2023-10-27", "updatedAt":"2023-10-27"},
+
+    {"id": 7, "title": "Research security measures", "description": "Identify and implement new security measures to protect the company's website and systems from cyberattacks.", "category": "IT Security", "authorizedBy": {"firstName":"Mary","lastName":"Jones"}, "dueDate": "2023-11-17", "status": "Not started", "createAt": "2023-10-27", "updatedAt":"2023-10-27"}
     ]
     

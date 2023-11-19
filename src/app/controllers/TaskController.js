@@ -23,7 +23,7 @@ class TaskController {
         });
 
         if (existedTask.statusCode == 200) {
-            return res.status(400).send("Task already exists!");
+            return res.status(409).send("Task already exists!");
         }
 
         // Create a new task document with the provided fields
@@ -33,7 +33,7 @@ class TaskController {
             title,
             description,
             category,
-            authorizedBy:{
+            authorizedBy: {
                 firstName: req.userData.firstName,
                 lastName: req.userData.lastName
             },
@@ -81,7 +81,7 @@ class TaskController {
             const task = response.body;
 
 
-            return res.json({ task });
+            return res.status(200).json({ task });
         } catch (error) {
 
 
@@ -105,7 +105,7 @@ class TaskController {
                 type: 'tasks',
                 id,
             });
-  
+
             const updatedTask = req.body
             // add updateAt
             updatedTask.updateAt = new Date();
@@ -161,7 +161,7 @@ class TaskController {
     };
 
     //Func: Get all tasks of an user
-    async getAllTask(req, res){
+    async getAllTask(req, res) {
         const userId = req.userId
         try {
             const usersTasks = await client.search({
@@ -173,7 +173,11 @@ class TaskController {
                     },
                 },
             });
-            res.status(200).send(usersTasks.body.hits.hits)
+            if (usersTasks.body.hits.hits.length === 0) {
+                res.json({ message: "You don't have any task yet" })
+            } else {
+                res.status(200).send(usersTasks.body.hits.hits)
+            }
         } catch (error) {
             throw error
         }
@@ -188,7 +192,7 @@ class TaskController {
     //Func: Search task
     async searchTask(req, res) {
         const { sortBy = "id", sortOrder = "asc", ...filters } = req.query; //sort go sort, others go filters
-        const sensitiveFields = ['password']; 
+        const sensitiveFields = ['password'];
 
         try {
             // Initialize the query
@@ -222,10 +226,10 @@ class TaskController {
                     size: 1000,
                     // sort: sortOptions,
                     sort: [{
-                        [sortBy]:{
-                        order: sortOrder
-                    }
-                }]
+                        [sortBy]: {
+                            order: sortOrder
+                        }
+                    }]
                 },
             };
 
@@ -238,9 +242,9 @@ class TaskController {
 
 
             if (tasks.length === 0) {
-                res.status(404).send('Task not found!');
+                res.status(204).send('Task not found!');
             } else {
-                res.json({ message: `total tasks found: ${response.body.hits.total}`,tasks });
+                res.status(200).json({ message: `total tasks found: ${response.body.hits.total}`, tasks });
             }
         } catch (error) {
             console.error(error);
@@ -253,25 +257,50 @@ class TaskController {
 
 
 
-    //Bulk
-
-    async bulkDataset(req, res) {
-        const datasetPath = path.resolve(__dirname, '../../../test/dataset/dataset.json');
+    //Bulk users dataset
+    async bulkUsersDataset(req, res) {
+        const datasetPath = path.resolve(__dirname, '../../../test/dataset/users_dataset.json');
         const dataset = JSON.parse(fs.readFileSync(datasetPath, 'utf8'));
-      
+
         const bulkData = [];
-        
+
         for (const object of dataset) {
-          bulkData.push({ index: { _index: 'todos_test', _type: 'tasks', _id: object.id } });
-          bulkData.push(object);
+            bulkData.push({ index: { _index: 'users_test', _type: 'users' } });
+            bulkData.push(object);
         }
-        await client.bulk({ 
-            refresh: true, 
-            body: bulkData });
+        await client.bulk({
+            refresh: true,
+            body: bulkData
+        });
+
+
+
 
         res.send(bulkData)
-      }
-      
+    }
+
+
+    //Bulk tasks dataset
+    async bulkTasksDataset(req, res) {
+        const datasetPath = path.resolve(__dirname, '../../../test/dataset/tasks_dataset.json');
+        const dataset = JSON.parse(fs.readFileSync(datasetPath, 'utf8'));
+        const bulkData = [];
+
+        for (const object of dataset) {
+            bulkData.push({ index: { _index: 'todos_test', _type: 'users' } });
+            bulkData.push(object);
+        }
+        await client.bulk({
+            refresh: true,
+            body: bulkData
+        });
+
+
+
+
+        res.send(bulkData)
+    }
+
 
 
 }

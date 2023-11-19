@@ -74,7 +74,7 @@ class TemplateController {
 
             const response = await client.indices.putTemplate({
                 name: "users_template",
-                body: usersTemplateConfigaaa
+                body: usersTemplateConfig
             })
             res.status(201).json({ message: "Users'template created successfully" });
         } catch (error) {
@@ -91,7 +91,7 @@ class TemplateController {
             if (error.statusCode == 404) {
                 return res.status(404).json({ message: "Template not found!" });
             } else {
-                return res.status(500).json({ message: "Failed to get template.", error });
+                return res.status(400).json({ message: "Failed to get template.", error });
             }
         }
 
@@ -106,7 +106,7 @@ class TemplateController {
             if (error.statusCode == 404) {
                 return res.status(404).json({ message: "Template not found!" });
             } else {
-                return res.status(500).json({ message: "Failed to delete template.", error });
+                return res.status(400).json({ message: "Failed to delete template.", error });
             }
         }
 

@@ -2,43 +2,49 @@
 ```
 todo_es
 ├─ .env
-├─ package.json
+├─ Archieve
 ├─ README.md
+├─ package.json
 ├─ src
 │  ├─ app
 │  │  ├─ controllers
 │  │  │  ├─ MappingController.js
 │  │  │  ├─ TaskController.js
+│  │  │  ├─ TemplateController.js
 │  │  │  └─ UserController.js
-│  │  └─ middlewares
-│  │     └─ ValidateMiddleware.js
+│  │  ├─ middlewares
+│  │  │  ├─ authValidation.js
+│  │  │  ├─ taskOwnershipValidation.js
+│  │  │  ├─ taskValidation.js
+│  │  │  └─ userValidation.js
+│  │  └─ validation
+│  │     ├─ schema
+│  │     │  ├─ createTaskSchema.json
+│  │     │  ├─ createUserSchema.json
+│  │     │  ├─ updateTaskSchema.json
+│  │     │  └─ updateUserSchema.json
+│  │     └─ schemaReader.js
 │  ├─ config
 │  │  ├─ cucumber.js
-│  │  ├─ swagger-ui.js
+│  │  ├─ swaggerConfig.js
+│  │  ├─ swaggerDoc.js
 │  │  └─ test-config.js
 │  ├─ index.js
-│  ├─ routes
-│  │  ├─ index.js
-│  │  ├─ mappings.js
-│  │  ├─ tasks.js
-│  │  └─ users.js
-│  └─ validation
-│     ├─ schema
-│     │  ├─ createTaskSchema.json
-│     │  └─ updateTaskSchema.json
-│     └─ taskSchema.js
+│  └─ routes
+│     ├─ index.js
+│     ├─ mappings.js
+│     ├─ tasks.js
+│     ├─ templates.js
+│     └─ users.js
 └─ test
-   ├─ features
-   │  ├─ dataset
-   │  │  └─ dataset.json
-   │  ├─ data_test
-   │  ├─ report
-   │  │  ├─ cucumber_report.html
-   │  │  └─ cucumber_report.json
-   │  ├─ step_definitions
-   │  │  └─ stepdefs.js
-   │  └─ tasks.feature
-   └─ unit_test
+   └─ features
+      ├─ dataset
+      │  └─ dataset.json
+      ├─ report
+      │  ├─ cucumber_report.html
+      │  └─ cucumber_report.json
+      ├─ step_definitions
+      │  └─ stepdefs.js
+      └─ tasks.feature
 
 ```
-

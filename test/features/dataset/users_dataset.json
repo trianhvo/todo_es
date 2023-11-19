@@ -1,0 +1,26 @@
+[
+    {
+        "username": "johndoe",
+        "password": "$2a$10$WMO/8Zcq8tTi3L7v07O6ueSeO37jZTR0dn0IQTHhIrVjkcLxVq0LK",
+        "email": "johndoe@gmail.com",
+        "firstName": "John",
+        "lastName": "Doe",
+        "phone": "015555555555"
+    },
+    {
+        "username": "janesmith",
+        "password": "$2a$10$PaKna7EHyjGlgoMtIHV2L.QmYIVC0CQc/yJ6ANoWWOmW8GZb14eda",
+        "email": "janesmith@gmail.com",
+        "firstName": "Jane",
+        "lastName": "Smith",
+        "phone": "014444444444"
+    },
+    {
+        "username": "anhvu",
+        "password": "$2a$10$W3YO7FdITwvpZhQigz5aru.kajbIt.E0l.wAt5r46RAZgZTRigWQq",
+        "email": "anhvu@gmail.com",
+        "firstName": "Anh",
+        "lastName": "Vu",
+        "phone": "011111111111"
+    }
+ ]

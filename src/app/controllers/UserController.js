@@ -30,7 +30,7 @@ class UserController {
                 type: 'users',
                 body: {
                     query: {
-                        match: { username },
+                        term: { username },
                     },
                 },
             });
@@ -40,7 +40,7 @@ class UserController {
                 type: 'users',
                 body: {
                     query: {
-                        match: { email },
+                        term: { email },
                     },
                 },
             });
@@ -161,7 +161,7 @@ class UserController {
             const userData = response.body.hits.hits[0]._source;
             res.status(200).json(userData);
         } catch (error) {
-            res.status(404).json({ message: "Failed to retreive user" })
+            res.status(400).json({ message: "Failed to retreive user" })
         }
     };
 
@@ -207,7 +207,7 @@ class UserController {
 
             res.status(200).json({ message: 'User data updated successfully', token: newToken });
         } catch (error) {
-            throw error
+            res.status(400).json({ message: "Failed to update user's data" })
         }
     };
 
@@ -255,7 +255,7 @@ class UserController {
                     }
                 }
             })
-            res.json({ message: "Done" })
+            res.status(200).json({ message: "Password changed succesfully" })
         } catch (error) {
             res.status(401).json({ message: 'Failed to update password' });
         }
@@ -266,35 +266,15 @@ class UserController {
     async deleteUser(req, res) {
 
         try {
-            const decodedToken = jwt.verify(req.token, jwtSecretKey);
-
-            const { username, email } = decodedToken;
-
-            const searchResponse = await client.search({
-                index,
-                body: {
-                    query: {
-                        bool: {
-                            must: [
-                                { match: { username } },
-                                { match: { email } }
-                            ]
-                        }
-                    }
-                }
-            })
-
-            const userId = searchResponse.body.hits.hits[0]._id;
-
             await client.delete({
                 index,
                 type: 'users',
-                id: userId,
+                id: req.userId,
             });
-            res.json({ message: "User deleted" })
+            res.status(200).json({ message: "User deleted" })
         }
         catch (error) {
-            return res.status(500).json({ message: "Delete failed" })
+            return res.status(400).json({ message: "Delete failed" })
         }
     }
 
@@ -307,10 +287,10 @@ class UserController {
         const hasSensitiveFields = sensitiveFields.some(field => filters[field]);
 
         if (hasSensitiveFields) {
-          return res.status(400).json({ error: 'You cannot search by sensitive fields.' });
+            return res.status(400).json({ error: 'You cannot search by sensitive fields.' });
         }
 
-        
+
         try {
             // Initialize the query
             let query = {
@@ -362,13 +342,13 @@ class UserController {
 
 
             if (tasks.length === 0) {
-                res.status(404).send('User not found!');
+                res.status(204).send('User not found!');
             } else {
-                res.json({ message: `total users found: ${response.body.hits.total}`, tasks });
+                res.status(200).json({ message: `total users found: ${response.body.hits.total}`, tasks });
             }
         } catch (error) {
             console.error(error);
-            res.status(500).send('Failed to search for users.');
+            res.status(400).send('Failed to search for users.');
         }
     }
 

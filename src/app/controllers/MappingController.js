@@ -54,9 +54,9 @@ class MappingController {
         body: fieldMapping,
       });
 
-      res.send('Mapping updated');
+      res.status(200).send('Mapping updated');
     } catch (error) {
-      res.status(500).send('Failed to update mapping.');
+      res.status(400).send('Failed to update mapping.');
     }
   };
 
@@ -82,9 +82,9 @@ class MappingController {
     }
   };
 
-  //Func: delete mapping (delete index)
-  //issue: add not found mapping
-  async deleteIndex(req, res) {
+  
+
+  async resetIndex(req, res) {
     const {index} = req.body
     try {
       const response = await client.indices.delete({

@@ -1,3 +1,4 @@
+require('dotenv').config()
 module.exports = {
   elasticsearch: {
   todosIndex: process.env.NODE_ENV === 'test' ? 'todos_test' : 'todos',
